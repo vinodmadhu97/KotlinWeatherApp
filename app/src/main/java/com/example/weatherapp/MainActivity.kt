@@ -16,12 +16,19 @@ import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import com.example.weatherapp.models.WeatherModel
+import com.example.weatherapp.network.WeatherService
 import com.google.android.gms.location.*
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import java.lang.Exception
 
 class MainActivity : AppCompatActivity() {
@@ -86,14 +93,40 @@ class MainActivity : AppCompatActivity() {
 
             Log.i("data","lat $latitude")
             Log.i("data","longi $longitude")
-            getLocationWeatherDetails()
+            getLocationWeatherDetails(latitude,longitude)
         }
     }
 
 
-    private fun getLocationWeatherDetails(){
+    private fun getLocationWeatherDetails(latitude:Double, longitude:Double){
         if (Constants.isNetworkAvailable(this)){
-            Toast.makeText(this,"you have connected to the internet",Toast.LENGTH_LONG).show()
+            val retrofit:Retrofit = Retrofit.Builder()
+                .baseUrl(Constants.BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+
+            val service : WeatherService = retrofit.create(WeatherService::class.java)
+
+            val listCall : Call<WeatherModel> = service.getweather(latitude,longitude,Constants.METRIC_UNIT,Constants.APP_ID)
+
+            listCall.enqueue(object : Callback<WeatherModel>{
+                override fun onResponse(
+                    call: Call<WeatherModel>,
+                    response: Response<WeatherModel>
+                ) {
+                    if (response.isSuccessful){
+                        val weatherList : WeatherModel? = response.body()
+                        Log.i("data","$weatherList")
+                    }else{
+                        Log.i("data","${response.code()}")
+                    }
+                }
+
+                override fun onFailure(call: Call<WeatherModel>, t: Throwable) {
+                    Log.e("data","${t.message.toString()}")
+                }
+
+            })
         }else{
             Toast.makeText(this,"internet connection failed",Toast.LENGTH_LONG).show()
         }

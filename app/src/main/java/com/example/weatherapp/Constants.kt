@@ -4,9 +4,15 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
-import com.google.android.gms.dynamic.IFragmentWrapper
+
 
 object Constants{
+
+    const val APP_ID = "ed60fcfbd110ee65c7150605ea8aceea"
+    const val BASE_URL = "http://api.openweathermap.org/data/"
+    const val METRIC_UNIT = "metric"
+
+
     fun isNetworkAvailable(context: Context):Boolean{
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
