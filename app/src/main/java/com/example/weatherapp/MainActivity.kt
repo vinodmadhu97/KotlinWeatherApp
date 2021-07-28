@@ -6,6 +6,7 @@ import android.app.Dialog
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
@@ -22,6 +23,7 @@ import androidx.appcompat.app.AlertDialog
 import com.example.weatherapp.models.WeatherModel
 import com.example.weatherapp.network.WeatherService
 import com.google.android.gms.location.*
+import com.google.gson.Gson
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
@@ -41,12 +43,14 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var mFusedLocationClient : FusedLocationProviderClient
     private var mProgressDialog : Dialog? = null
+    private lateinit var mSharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        mSharedPreferences = getSharedPreferences(Constants.PREFERENCE_NAME, Context.MODE_PRIVATE)
 
         if (!isLocationEnabled()){
             Toast.makeText(this,"please on the GPS",Toast.LENGTH_LONG).show()
@@ -138,8 +142,16 @@ class MainActivity : AppCompatActivity() {
                     if (response.isSuccessful){
                         val weatherList : WeatherModel? = response.body()
                         Log.i("data","$weatherList")
+
+
+                        val weatherresponseJsonString = Gson().toJson(weatherList)
+                        var editor = mSharedPreferences.edit()
+                        editor.putString(Constants.WEATHER_DATA,weatherresponseJsonString)
+                        editor.apply()
+
                         setupUI(weatherList)
                         dismissCustomProgressDialog()
+
                     }else{
                         Log.i("data","${response.code()}")
                     }
@@ -174,7 +186,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupUI(weatherModel: WeatherModel?){
-        if (weatherModel != null){
+
+        val sharedPreferencesweatherData = mSharedPreferences.getString(Constants.WEATHER_DATA,"")
+
+        if (!sharedPreferencesweatherData.isNullOrEmpty()){
+            val weatherModel = Gson().fromJson(sharedPreferencesweatherData,WeatherModel::class.java)
             for (i in weatherModel.weather.indices){
                 tv_weather.text = weatherModel.weather[i].main
                 tv_weather_description.text = weatherModel.weather[i].description
@@ -209,6 +225,8 @@ class MainActivity : AppCompatActivity() {
 
             }
         }
+
+
 
     }
 
