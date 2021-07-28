@@ -32,6 +32,8 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.lang.Exception
+import java.text.SimpleDateFormat
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -175,11 +177,26 @@ class MainActivity : AppCompatActivity() {
                 tv_weather.text = weatherModel.weather[i].main
                 tv_weather_description.text = weatherModel.weather[i].description
                 tv_temp.text = weatherModel.main.temp.toString() + "°C"
+                tv_humidity.text = weatherModel.main.humidity.toString() + " per cents"
+                tv_temp_max.text = weatherModel.main.temp_max.toString() + "°C"
+                tv_temp_min.text = weatherModel.main.temp_min.toString() + "°C"
+                tv_wind_speed.text = weatherModel.wind.speed.toString() + " Kmh"
+                tv_district_name.text = weatherModel.name
+                tv_country_name.text = weatherModel.sys.country
+
+                tv_sunrise_time.text = unixTime(weatherModel.sys.sunrise)
+                tv_sunset_time.text = unixTime(weatherModel.sys.sunset)
 
             }
         }
 
     }
 
+    private fun unixTime(timex :Long):String{
+        val date = Date(timex*1000L)
+        val sdf = SimpleDateFormat("HH:mm",Locale.UK)
+        sdf.timeZone = TimeZone.getDefault()
 
+        return sdf.format(date)
+    }
 }

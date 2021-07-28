@@ -109,7 +109,7 @@
                         android:textSize="18sp"
                         android:textStyle="bold"/>
                     <TextView
-                        android:id="@+id/tv_percent"
+                        android:id="@+id/tv_humidity"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:textColor="@color/secodary_text_color"
@@ -227,11 +227,11 @@
                         android:layout_height="wrap_content"
                         android:gravity="end"
                         android:textColor="@color/primary_text_color"
-                        android:text="wind"
+                        android:text="Wind"
                         android:textSize="18sp"
                         android:textStyle="bold"/>
                     <TextView
-                        android:id="@+id/tv_wind_description"
+                        android:id="@+id/tv_wind_speed"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:textColor="@color/secodary_text_color"
@@ -283,7 +283,7 @@
                     android:layout_margin="8dp"
                     android:orientation="vertical">
                     <TextView
-
+                        android:id="@+id/tv_district_name"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Name"
@@ -321,7 +321,7 @@
                         android:layout_margin="8dp"
                         android:src="@drawable/sunrise"/>
                     <TextView
-                        android:id="@+id/tv_sunrise_description"
+                        android:id="@+id/tv_sunrise_time"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
@@ -340,7 +340,7 @@
                         android:layout_margin="8dp"
                         android:src="@drawable/sunset"/>
                     <TextView
-                        android:id="@+id/tv_sunset_description"
+                        android:id="@+id/tv_sunset_time"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
