@@ -2,6 +2,7 @@ package com.example.weatherapp
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Dialog
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -24,6 +25,7 @@ import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
+import kotlinx.android.synthetic.main.activity_main.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -32,7 +34,10 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.lang.Exception
 
 class MainActivity : AppCompatActivity() {
+
     private lateinit var mFusedLocationClient : FusedLocationProviderClient
+    private var mProgressDialog : Dialog? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -65,6 +70,18 @@ class MainActivity : AppCompatActivity() {
                 }
 
             }).onSameThread().check()
+        }
+    }
+
+    private fun showCustomProgressDialog(){
+        mProgressDialog = Dialog(this)
+        mProgressDialog!!.setContentView(R.layout.custom_progress_dialog)
+        mProgressDialog!!.show()
+    }
+
+    private fun dismissCustomProgressDialog(){
+        if (mProgressDialog != null){
+            mProgressDialog!!.dismiss()
         }
     }
 
@@ -107,8 +124,8 @@ class MainActivity : AppCompatActivity() {
 
             val service : WeatherService = retrofit.create(WeatherService::class.java)
 
-            val listCall : Call<WeatherModel> = service.getweather(latitude,longitude,Constants.METRIC_UNIT,Constants.APP_ID)
-
+            val listCall : Call<WeatherModel> = service.getWeather(latitude,longitude,Constants.METRIC_UNIT,Constants.APP_ID)
+            showCustomProgressDialog()
             listCall.enqueue(object : Callback<WeatherModel>{
                 override fun onResponse(
                     call: Call<WeatherModel>,
@@ -117,6 +134,8 @@ class MainActivity : AppCompatActivity() {
                     if (response.isSuccessful){
                         val weatherList : WeatherModel? = response.body()
                         Log.i("data","$weatherList")
+                        setupUI(weatherList)
+                        dismissCustomProgressDialog()
                     }else{
                         Log.i("data","${response.code()}")
                     }
@@ -124,6 +143,7 @@ class MainActivity : AppCompatActivity() {
 
                 override fun onFailure(call: Call<WeatherModel>, t: Throwable) {
                     Log.e("data","${t.message.toString()}")
+                    dismissCustomProgressDialog()
                 }
 
             })
@@ -148,4 +168,18 @@ class MainActivity : AppCompatActivity() {
                 dialog.dismiss()
             }.show()
     }
+
+    private fun setupUI(weatherModel: WeatherModel?){
+        if (weatherModel != null){
+            for (i in weatherModel.weather.indices){
+                tv_weather.text = weatherModel.weather[i].main
+                tv_weather_description.text = weatherModel.weather[i].description
+                tv_temp.text = weatherModel.main.temp.toString() + "°C"
+
+            }
+        }
+
+    }
+
+
 }
